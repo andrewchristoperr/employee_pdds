@@ -5,11 +5,11 @@ $client = new MongoDB\Client();
 $resto = $client->andrew->employee;
 
 // Fetch all distinct borough values
-$distinctScore= $resto->distinct('Performance Score');
+// $distinctScore= $resto->distinct('Performance Score');
 
 // Filter options
-$scoreFilter = isset($_GET['score']) ? $_GET['score'] : null;
-$ratingFilter = isset($_GET['rating']) ? intval($_GET['rating']) : null;
+// $scoreFilter = isset($_GET['score']) ? $_GET['score'] : null;
+// $ratingFilter = isset($_GET['rating']) ? intval($_GET['rating']) : null;
 
 // MongoDB aggregation pipeline to filter by last grade's score
 $pipeline = [];
@@ -18,24 +18,30 @@ $pipeline = [];
 $pipeline[] = [
     '$group' => [
         '_id' => '$Employee ID',
-        'name' => ['$first' => '$Employee Name'],
-        'score' => ['$first' => '$Performance Score'],
-        'current_employee_rating' => ['$first' => '$Current Employee Rating'],
+        'Employee Name' => ['$first' => '$Employee Name'],
+        'Performance Score' => ['$first' => '$Performance Score'],
+        'Current Employee Rating' => ['$first' => ['$toInt' => '$Current Employee Rating']],
     ],
 ];
 
-// Match by last grade's score less than the given score
-if ($scoreFilter) {
-    $pipeline[] = ['$match' => ['score' => ['$lt' => $scoreFilter]]];
-}
+// Match by Performance Score
+// if ($scoreFilter) {
+    $pipeline[] = ['$match' => ['Performance Score' => "Needs Improvement"]];
+// }
+
+// Match by Rating less than the given Rating
+// if ($ratingFilter) {
+    $pipeline[] = ['$match' => ['Current Employee Rating' => ['$lte' => 1]]];
+// }
 
 $cursor = $resto->aggregate($pipeline);
 
 // Convert MongoDB cursor to PHP array
-$restaurants = iterator_to_array($cursor);
+$employee = iterator_to_array($cursor);
 
 // Convert PHP array to JSON
-$restaurantsJson = json_encode($restaurants);
+$employeeJson = json_encode($employee);
+
 ?>
 
 <!DOCTYPE html>
@@ -71,31 +77,12 @@ $restaurantsJson = json_encode($restaurants);
 <body>
     <div class="container mt-5 mb-5">
         <div class="row d-flex justify-content-center">
-            <h1 class="text-center">Restaurant</h1>
-            <div class="col-md-8">
-                <form method="GET">
-                    <label>Filter by Performance Score:</label>
-                    <select id="score" name="score" class="form-select mb-3">
-                        <option value="">All Performance Score</option>
-                        <?php
-                        foreach ($distinctScore as $ScoreOption) {
-                            $selected = ($ScoreOption == $scoreFilter) ? 'selected' : '';
-                            echo "<option value='$ScoreOption' $selected>$ScoreOption</option>";
-                        }
-                        ?>
-                    </select>
-
-                    <label for="cuisineFilter">Filter by Rating (Less Than)</label>
-                    <input type="text" id="cuisineFilter" name="cuisine" class="form-control mb-3" placeholder="Enter Cuisine" value="">
-
-                    <button type="submit" class="btn btn-primary mb-5">Apply Filters</button>
-                </form>
-            </div>
+            <h1 class="text-center">Worst Performance Score and Rating</h1>
         </div>
 
         <div class="row d-flex justify-content-center">
             <div class="col-md-10">
-                <table id="restaurantTable" class="table table-bordered table-striped">
+                <table id="employeeTable" class="table table-bordered table-striped">
                     <thead class="">
                         <tr>
                             <th>Name</th>
@@ -113,25 +100,25 @@ $restaurantsJson = json_encode($restaurants);
 
     <script>
         // Use the fetched JSON data
-        var restaurantsData = <?php echo $restaurantsJson; ?>;
+        var employeeData = <?php echo $employeeJson; ?>;
 
         $(document).ready(function() {
             // Initialize DataTable
-            var table = $('#restaurantTable').DataTable({
-                scrollX: true,
+            var table = $('#employeeTable').DataTable({
+                // scrollX: true,
                 scrollCollapse: true,
-                searching: false,
-                data: restaurantsData,
+                // searching: false,
+                data: employeeData,
                 columns: [{
-                        data: 'name',
+                        data: 'Employee Name',
                         width: '28%'
                     },
                     {
-                        data: 'score',
+                        data: 'Performance Score',
                         width: '20%',
                     },
                     {
-                        data: 'current_employee_rating',
+                        data: 'Current Employee Rating',
                         width: '20%',
                     },
                 ]

@@ -126,11 +126,11 @@ $restaurantsJson = json_encode($restaurants);
                         <tr>
                             <th>id</th>
                             <th>Name</th>
-                            <!-- <th>Address</th>
+                            <th>Address</th>
                             <th>Borough</th>
                             <th>Cuisine</th>
                             <th>Grade</th>
-                            <th>Last Grade's Score</th> -->
+                            <th>Last Grade's Score</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -160,27 +160,27 @@ $restaurantsJson = json_encode($restaurants);
                         data: 'name',
                         width: '25%'
                     },
-                    // {
-                    //     data: 'address.street',
-                    //     width: '20%',
-                    //     defaultContent: ''
-                    // },
-                    // {
-                    //     data: 'borough',
-                    //     width: '15%'
-                    // },
-                    // {
-                    //     data: 'cuisine',
-                    //     width: '15%'
-                    // },
-                    // {
-                    //     data: 'grade',
-                    //     width: '5%'
-                    // },
-                    // {
-                    //     data: 'last_score',
-                    //     width: '15%'
-                    // },
+                    {
+                        data: 'address.street',
+                        width: '20%',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'borough',
+                        width: '15%'
+                    },
+                    {
+                        data: 'cuisine',
+                        width: '15%'
+                    },
+                    {
+                        data: 'grade',
+                        width: '5%'
+                    },
+                    {
+                        data: 'last_score',
+                        width: '15%'
+                    },
                 ]
             });
         });
