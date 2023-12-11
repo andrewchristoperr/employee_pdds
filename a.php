@@ -66,6 +66,7 @@ $employeeJson = json_encode($employee);
     ?>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lexend&display=swap');
         .container {
             border: 1px solid black;
             border-radius: 15px;
