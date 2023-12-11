@@ -98,18 +98,14 @@ require 'connect.php';
                             </div>
                         </div>
                     </div>
-
                 </div>
-
-
             </div>
-
         </div>
     </div>
-
-
-
-
+    <script>
+        $(document).ready(function() {
+            $('#tablePendapatan').DataTable();
+        });
+    </script>
 </body>
-
 </html>
