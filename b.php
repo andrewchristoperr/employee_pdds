@@ -63,6 +63,49 @@ require 'connect.php';
                 <div class="section-title" data-aos="fade-in" data-aos-delay="100">
                     <h1>Satisfaction Score by Dept and Race</h1>
                 </div>
+
+                <?php
+                    // Mendapatkan SELECT DISTINCT untuk departemen
+                    $distinctDeptNameQuery = "SELECT DISTINCT dept_name FROM employee ORDER BY dept_name";
+                    $distinctDeptNameResult = $conn->query($distinctDeptNameQuery);
+                    $distinctDeptName = $distinctDeptNameResult->fetchAll(PDO::FETCH_COLUMN);
+
+                    // Mendapatkan SELECT DISTINCT untuk ras
+                    $distinctRaceQuery = "SELECT DISTINCT race FROM employee ORDER BY race";
+                    $distinctRaceResult = $conn->query($distinctRaceQuery);
+                    $distinctRace = $distinctRaceResult->fetchAll(PDO::FETCH_COLUMN);
+
+                    // Set the filter values based on the submitted form values
+                    $deptNameFilter = isset($_GET['dept_name']) ? $_GET['dept_name'] : '';
+                    $raceFilter = isset($_GET['race']) ? $_GET['race'] : '';
+                ?>
+
+                <form method="GET">
+                <label>Filter by Department:</label>
+                <select id="deptNameFilter" name="dept_name" class="form-select mb-3">
+                    <option value="">All Departments</option>
+                    <?php
+                    foreach ($distinctDeptName as $deptNameOption) {
+                        $selected = ($deptNameOption == $deptNameFilter) ? 'selected' : '';
+                        echo "<option value='$deptNameOption' $selected>$deptNameOption</option>";
+                    }
+                    ?>
+                </select>
+
+                <label>Filter by Race:</label>
+                <select id="raceFilter" name="race" class="form-select mb-3">
+                    <option value="">All Races</option>
+                    <?php
+                    foreach ($distinctRace as $raceOption) {
+                        $selected = ($raceOption == $raceFilter) ? 'selected' : '';
+                        echo "<option value='$raceOption' $selected>$raceOption</option>";
+                    }
+                    ?>
+                </select>
+
+                    <button type="submit" class="btn btn-primary mb-5">Apply Filters</button>
+                </form>
+
                 <div class="row">
                     <div>
                         <div class="row d-flex justify-content-center">
@@ -77,11 +120,17 @@ require 'connect.php';
                                     </thead>
                                     <tbody class="center-contents">
                                         <?php
-                                        $survey =  "SELECT employee.dept_name, employee.race, AVG(survey.satisfaction_score) AS avg_satisfaction_score
-                                                        FROM employee
-                                                        JOIN survey ON employee.emp_id = survey.emp_id
-                                                        GROUP BY employee.dept_name, employee.race";
-                                        $result = $conn->query($survey)->fetchAll();
+                                        $survey = "SELECT employee.dept_name, employee.race, AVG(survey.satisfaction_score) AS avg_satisfaction_score
+                                                    FROM employee
+                                                    JOIN survey ON employee.emp_id = survey.emp_id
+                                                    WHERE (:deptNameFilter = '' OR employee.dept_name = :deptNameFilter)
+                                                    AND (:raceFilter = '' OR employee.race = :raceFilter)
+                                                    GROUP BY employee.dept_name, employee.race";
+                                        $stmt = $conn->prepare($survey);
+                                        $stmt->bindParam(':deptNameFilter', $deptNameFilter);
+                                        $stmt->bindParam(':raceFilter', $raceFilter);
+                                        $stmt->execute();
+                                        $result = $stmt->fetchAll();
                                         foreach ($result as $data) :
                                         ?>
                                             <tr>
