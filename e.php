@@ -8,6 +8,7 @@ require 'connect.php';
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Salary</title>
 
     <meta content="" name="description">
     <meta content="" name="keywords">
@@ -56,17 +57,17 @@ require 'connect.php';
         include 'navbar.php';
     ?>
 
-    <div class="container">
+    <div class="container mt-5 mb-5">
         <div class="row">
-            <div class="container mt-5" style="text-align: center">
+            <div style="text-align: center">
                 <div class="section-title" data-aos="fade-in" data-aos-delay="100">
                     <h2>Comparation Salary Given dan Salary Desired</h2>
                 </div>
                 <div class="row">
-                    <div class="container">
-                        <div class="col-6">
-                            <div class="table-responsive rounded-table">
-                                <table id="tablePendapatan" class="table table-striped nowrap" style="width:100%">
+                    <div>
+                        <div class="row d-flex justify-content-center">
+                            <div class="col-md-10">
+                                <table id="tablePendapatan" class="table table-bordered table-striped" style="width:100%">
                                     <thead>
                                         <tr>
                                             <th scope="col" class="center-contents">Position</th>
