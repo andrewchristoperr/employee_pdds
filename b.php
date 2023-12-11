@@ -45,7 +45,7 @@ require 'connect.php';
         @import url('https://fonts.googleapis.com/css2?family=Lexend&display=swap');
 
         * {
-            font-family: 'Lexend', sans-serif !important
+            font-family: 'Lexend', sans-serif
         }
     </style>
 
