@@ -61,7 +61,7 @@ require 'connect.php';
         <div class="row">
             <div style="text-align: center">
                 <div class="section-title" data-aos="fade-in" data-aos-delay="100">
-                    <h2>Satisfaction Score by Dept and Race</h2>
+                    <h1>Satisfaction Score by Dept and Race</h1>
                 </div>
                 <div class="row">
                     <div>
