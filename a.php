@@ -60,7 +60,10 @@ $employeeJson = json_encode($employee);
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    
+
+    <?php
+        include 'navhead.php';
+    ?>
 
     <style>
         .container {
@@ -75,6 +78,9 @@ $employeeJson = json_encode($employee);
 </head>
 
 <body>
+    <?php
+        include 'navbar.php';
+    ?>
     <div class="container mt-5 mb-5">
         <div class="row d-flex justify-content-center">
             <h1 class="text-center">Worst Performance Score and Rating</h1>
