@@ -74,6 +74,9 @@ $applicantJson = json_encode($applicant);
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
+    <?php
+        include 'navhead.php';
+    ?>
 
     <style>
         .container {
@@ -88,6 +91,9 @@ $applicantJson = json_encode($applicant);
 </head>
 
 <body>
+    <?php
+        include 'navbar.php';
+    ?>
     <div class="container mt-5 mb-5">
         <div class="row d-flex justify-content-center">
             <h1 class="text-center">Applicant</h1>
