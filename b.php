@@ -51,9 +51,17 @@ $raceFilter = isset($_GET['race']) ? $_GET['race'] : '';
     <!-- Sweet Alert -->
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" id="theme-styles">
-
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <?php
-        include 'navhead.php';
+    include 'navhead.php';
     ?>
 
     <style>
@@ -68,12 +76,12 @@ $raceFilter = isset($_GET['race']) ? $_GET['race'] : '';
 
 <body>
     <?php
-        include 'navbar.php';
+    include 'navbar.php';
     ?>
 
     <div class="container mt-5 mb-5">
-        <div style="text-align: center" class="row d-flex justify-content-center">
-            <h1>Satisfaction Score by Department and Race</h1>
+        <div class="row d-flex justify-content-center">
+            <h1 class="text-center">Satisfaction Score by Department and Race</h1>
             <div class="col-md-8">
                 <form method="GET">
                     <label>Filter by Department:</label>
@@ -101,52 +109,57 @@ $raceFilter = isset($_GET['race']) ? $_GET['race'] : '';
                     <button type="submit" class="btn btn-primary mb-5">Apply Filters</button>
                 </form>
             </div>
+        </div>
 
-            <div class="row">
-                <div>
-                    <div class="row d-flex justify-content-center">
-                        <div class="col-md-10">
-                            <table id="tablePendapatan" class="table table-bordered table-striped" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" class="center-contents">Department</th>
-                                        <th scope="col" class="center-contents">Race</th>
-                                        <th scope="col" class="center-contents">Average Satisfaction Score</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="center-contents">
-                                    <?php
-                                    $survey = "SELECT employee.dept_name, employee.race, AVG(survey.satisfaction_score) AS avg_satisfaction_score
+        <div class="row">
+            <div>
+                <div class="row d-flex justify-content-center">
+                    <div class="col-md-10">
+                        <table id="tablePendapatan" class="table table-bordered table-striped" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="center-contents">Department</th>
+                                    <th scope="col" class="center-contents">Race</th>
+                                    <th scope="col" class="center-contents">Average Satisfaction Score</th>
+                                </tr>
+                            </thead>
+                            <tbody class="center-contents">
+                                <?php
+                                $survey = "SELECT employee.dept_name, employee.race, AVG(survey.satisfaction_score) AS avg_satisfaction_score
                                                 FROM employee
                                                 JOIN survey ON employee.emp_id = survey.emp_id
                                                 WHERE (:deptNameFilter = '' OR employee.dept_name = :deptNameFilter)
                                                 AND (:raceFilter = '' OR employee.race = :raceFilter)
                                                 GROUP BY employee.dept_name, employee.race";
-                                    $stmt = $conn->prepare($survey);
-                                    $stmt->bindParam(':deptNameFilter', $deptNameFilter);
-                                    $stmt->bindParam(':raceFilter', $raceFilter);
-                                    $stmt->execute();
-                                    $result = $stmt->fetchAll();
-                                    foreach ($result as $data) :
-                                    ?>
-                                        <tr>
-                                            <td><?= $data['dept_name'] ?></td>
-                                            <td><?= $data['race'] ?></td>
-                                            <td><?= number_format($data['avg_satisfaction_score'], 2) ?></td>
-                                        </tr>
-                                    <?php endforeach ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                $stmt = $conn->prepare($survey);
+                                $stmt->bindParam(':deptNameFilter', $deptNameFilter);
+                                $stmt->bindParam(':raceFilter', $raceFilter);
+                                $stmt->execute();
+                                $result = $stmt->fetchAll();
+                                foreach ($result as $data) :
+                                ?>
+                                    <tr>
+                                        <td><?= $data['dept_name'] ?></td>
+                                        <td><?= $data['race'] ?></td>
+                                        <td><?= number_format($data['avg_satisfaction_score'], 2) ?></td>
+                                    </tr>
+                                <?php endforeach ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <script>
-        $(document).ready(function() {
-            $('#tablePendapatan').DataTable();
-        });
-    </script>
+        <script>
+            $(document).ready(function() {
+                $('#tablePendapatan').DataTable({
+                    "columnDefs": [{
+                        "className": "dt-center",
+                        "targets": "_all"
+                    }],
+                });
+            });
+        </script>
 </body>
+
 </html>

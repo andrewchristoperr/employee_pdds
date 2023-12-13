@@ -28,12 +28,12 @@ $pipeline[] = [
 
 // Match by Performance Score
 // if ($scoreFilter) {
-    $pipeline[] = ['$match' => ['Performance Score' => "Needs Improvement"]];
+$pipeline[] = ['$match' => ['Performance Score' => "Needs Improvement"]];
 // }
 
 // Match by Rating less than the given Rating
 // if ($ratingFilter) {
-    $pipeline[] = ['$match' => ['Current Employee Rating' => ['$lte' => 1]]];
+$pipeline[] = ['$match' => ['Current Employee Rating' => ['$lte' => 1]]];
 // }
 
 $cursor = $resto->aggregate($pipeline);
@@ -64,11 +64,12 @@ $employeeJson = json_encode($employee);
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
     <?php
-        include 'navhead.php';
+    include 'navhead.php';
     ?>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lexend&display=swap');
+
         .container {
             border: 1px solid black;
             border-radius: 15px;
@@ -82,7 +83,7 @@ $employeeJson = json_encode($employee);
 
 <body>
     <?php
-        include 'navbar.php';
+    include 'navbar.php';
     ?>
     <div class="container mt-5 mb-5">
         <div class="row d-flex justify-content-center">
@@ -121,6 +122,10 @@ $employeeJson = json_encode($employee);
                 searching: false,
                 paging: false,
                 info: false,
+                "columnDefs": [{
+                    "className": "dt-center",
+                    "targets": "_all"
+                }],
                 data: employeeData,
                 columns: [{
                         data: 'Employee Name',

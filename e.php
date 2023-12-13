@@ -59,9 +59,9 @@ require 'connect.php';
 
     <div class="container mt-5 mb-5">
         <div class="row">
-            <div style="text-align: center">
+            <div>
                 <div class="section-title" data-aos="fade-in" data-aos-delay="100">
-                    <h1>Comparation Salary Given dan Salary Desired</h1>
+                    <h1 class="text-center">Comparation Salary Given dan Salary Desired</h1>
                 </div>
                 <div class="row">
                     <div>
@@ -101,7 +101,12 @@ require 'connect.php';
     </div>
     <script>
         $(document).ready(function() {
-            $('#tablePendapatan').DataTable();
+            $('#tablePendapatan').DataTable({
+                "columnDefs": [{
+                    "className": "dt-center",
+                    "targets": "_all"
+                }],
+            });
         });
     </script>
 </body>

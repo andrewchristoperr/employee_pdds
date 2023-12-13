@@ -194,6 +194,10 @@ $applicantJson = json_encode($applicant);
                     searching: false,
                     // paging: false,
                     // info: false,
+                    "columnDefs": [{
+                        "className": "dt-center",
+                        "targets": "_all"
+                    }],
                     color: "red",
                     data: applicantData,
                     columns: [{
