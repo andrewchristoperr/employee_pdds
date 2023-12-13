@@ -21,6 +21,8 @@ $pipeline[] = [
         'Employee Name' => ['$first' => '$Employee Name'],
         'Performance Score' => ['$first' => '$Performance Score'],
         'Current Employee Rating' => ['$first' => ['$toInt' => '$Current Employee Rating']],
+        'Department' => ['$first' => '$Department'],
+        'Position' => ['$first' => '$Position'],
     ],
 ];
 
@@ -87,12 +89,14 @@ $employeeJson = json_encode($employee);
             <h1 class="text-center">Worst Performance Score and Rating</h1>
         </div>
 
-        <div class="row d-flex justify-content-center">
+        <div class="row d-flex justify-content-center mt-3">
             <div class="col-md-10">
                 <table id="employeeTable" class="table table-bordered table-striped">
                     <thead class="">
                         <tr>
                             <th>Name</th>
+                            <th>Department</th>
+                            <th>Position</th>
                             <th>Performance Score</th>
                             <th>Current Employee Rating</th>
                         </tr>
@@ -114,19 +118,29 @@ $employeeJson = json_encode($employee);
             var table = $('#employeeTable').DataTable({
                 // scrollX: true,
                 scrollCollapse: true,
-                // searching: false,
+                searching: false,
+                paging: false,
+                info: false,
                 data: employeeData,
                 columns: [{
                         data: 'Employee Name',
-                        width: '28%'
+                        width: '20%'
+                    },
+                    {
+                        data: 'Department',
+                        width: '20%',
+                    },
+                    {
+                        data: 'Position',
+                        width: '20%',
                     },
                     {
                         data: 'Performance Score',
-                        width: '20%',
+                        width: '18%',
                     },
                     {
                         data: 'Current Employee Rating',
-                        width: '20%',
+                        width: '22%',
                     },
                 ]
             });

@@ -75,11 +75,12 @@ $applicantJson = json_encode($applicant);
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
     <?php
-        include 'navhead.php';
+    include 'navhead.php';
     ?>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lexend&display=swap');
+
         .container {
             border: 1px solid black;
             border-radius: 15px;
@@ -87,13 +88,40 @@ $applicantJson = json_encode($applicant);
             padding-bottom: 25px;
             box-shadow: 0px 0px 7px #000000;
         }
+
+        /* (1) Change buttons (excluding active or disabled) */
+        /* .pagination>li>a {
+            background-color: #ADD8E6;
+            border-color: #F0F8FF;
+            color: #000000;
+        } */
+
+        /* (2) Change disabled buttons*/
+        /* .pagination>.disabled>a,
+        .pagination>.disabled>a:hover,
+        .pagination>.disabled>a:focus {
+            background-color: #E0FFFF;
+            border-color: #F0F8FF;
+            color: #000000;
+        } */
+
+        /* (3) Change active or hover button color*/
+        /* .pagination>.active>a,
+        .pagination>.active>a:hover,
+        .pagination>.active>a:focus,
+        .pagination>li>a:hover,
+        .pagination>li>a:focus {
+            background-color: #87CEFA;
+            border-color: #F0F8FF;
+            color: #000000;
+        } */
     </style>
 
 </head>
 
 <body>
     <?php
-        include 'navbar.php';
+    include 'navbar.php';
     ?>
     <div class="container mt-5 mb-5">
         <div class="row d-flex justify-content-center">
@@ -163,7 +191,10 @@ $applicantJson = json_encode($applicant);
                 var table = $('#applicantTable').DataTable({
                     // scrollX: true,
                     scrollCollapse: true,
-                    // searching: false,
+                    searching: false,
+                    // paging: false,
+                    // info: false,
+                    color: "red",
                     data: applicantData,
                     columns: [{
                             data: 'Position',
