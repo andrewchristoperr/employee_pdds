@@ -117,6 +117,9 @@ require 'connect.php';
                     "className": "dt-center",
                     "targets": "_all"
                 }],
+                paging: false,
+                info: false,
+                searching: false
             });
         });
     </script>
