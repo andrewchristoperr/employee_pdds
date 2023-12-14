@@ -4,19 +4,19 @@ require_once 'autoload.php';
 $client = new MongoDB\Client();
 $resto = $client->andrew->recruitment;
 
-// Fetch all distinct borough values
+// Fetch all distinct values for job title and education level
 $distinctJobTitle = $resto->distinct('Position');
 $distinctEducationLevel = $resto->distinct('Education Level');
 
 // Filter options
-$jobTitleFilter = isset($_GET['jobTitle']) ? $_GET['jobTitle'] : null;
-$educationLevelFilter = isset($_GET['educationLevel']) ? $_GET['educationLevel'] : null;
+$jobTitleFilter = isset($_GET['jobTitle']) ? $_GET['jobTitle'] : [];
+$educationLevelFilter = isset($_GET['educationLevel']) ? array_map('htmlspecialchars_decode', $_GET['educationLevel']) : [];
 $yearsFilter = isset($_GET['years']) ? intval($_GET['years']) : null;
 
 // MongoDB aggregation pipeline to filter by last grade's score
 $pipeline = [];
 
-// Group by restaurant_id and get the last grade's score
+// Group by job title, education level, and years of experience
 $pipeline[] = [
     '$group' => [
         '_id' => ['Job Title' => '$Position', 'Education Level' => '$Education Level', 'Years of Experience' => '$Years of Experience'],
@@ -27,26 +27,21 @@ $pipeline[] = [
     ],
 ];
 
-// Match by jobtitle
-if ($jobTitleFilter) {
-    $pipeline[] = ['$match' => ['Position' => $jobTitleFilter]];
+// Match by selected job titles
+if (!empty($jobTitleFilter)) {
+    $pipeline[] = ['$match' => ['Position' => ['$in' => $jobTitleFilter]]];
 }
 
-// Match by education level (case-insensitive)
-if ($educationLevelFilter) {
-    // $pipeline[] = ['$match' => ['Education Level' => ['$regex' => $educationLevelFilter, '$options' => 'i']]];
-    $pipeline[] = ['$match' => ['Education Level' => $educationLevelFilter]];
+// Match by selected education levels
+if (!empty($educationLevelFilter)) {
+    $pipeline[] = ['$match' => ['Education Level' => ['$in' => $educationLevelFilter]]];
 }
-
-
-
 
 // Match by years of experience less than the given years
 if ($yearsFilter) {
-    $pipeline[] = ['$match' => ['Years of Experience' => ['$lt' => $yearsFilter]]];
+    $pipeline[] = ['$match' => ['Years of Experience' => $yearsFilter]];
 }
 
-// var_dump($pipeline);
 $cursor = $resto->aggregate($pipeline);
 
 // Convert MongoDB cursor to PHP array
@@ -54,7 +49,6 @@ $applicant = iterator_to_array($cursor);
 
 // Convert PHP array to JSON
 $applicantJson = json_encode($applicant);
-
 ?>
 
 <!DOCTYPE html>
@@ -119,50 +113,218 @@ $applicantJson = json_encode($applicant);
         } */
     </style>
 
+    <!-- slicer -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+        body {
+            background-color: #f0f0f0;
+        }
+
+        .containerr {
+            width: auto;
+        }
+
+        .primary {
+            min-height: 800px;
+        }
+
+        /*** Accordion Toggles ***/
+        .panel-heading {
+            position: relative;
+        }
+
+        .panel-heading .accordion-toggle:after {
+            font-family: 'Glyphicons Halflings';
+            content: "\e260";
+            position: absolute;
+            right: 16px;
+        }
+
+        .panel-heading .accordion-toggle.collapsed:after {
+            font-family: 'Glyphicons Halflings';
+            content: "\e259";
+        }
+
+        /*** Filter Menu ***/
+        /* Panels */
+        .filter-menu {
+            min-width: 300px;
+        }
+
+        .filter-menu .panel {
+            border-radius: 0;
+            border: 1px solid #eeeeee;
+        }
+
+        .filter-menu .panel-heading {
+            background: #fff;
+            padding: 0;
+        }
+
+        .filter-menu .panel-title {
+            color: #333333;
+            font-weight: bold;
+            display: block;
+            padding: 16px;
+        }
+
+        .filter-menu a.panel-title {
+            color: #333333;
+        }
+
+        .filter-menu a.panel-title:hover,
+        .filter-menu a.panel-title:focus {
+            color: #333333;
+            text-decoration: none;
+        }
+
+        .filter-menu .panel-body {
+            padding: 16px;
+        }
+
+        /* Inner Panels */
+        .filter-menu .panel-group {
+            margin: -16px;
+        }
+
+        .filter-menu .panel-group .panel-title {
+            background: #eee;
+            transition: color, 0.5s, ease;
+        }
+
+        .filter-menu .panel-group .panel-title:hover {
+            color: #333333;
+            text-decoration: none;
+            background: #777777;
+        }
+
+        .filter-menu .panel-group .panel+.panel {
+            margin-top: 0;
+        }
+
+        /*** Filter Menu - Mobile ***/
+        /* Panels - Mobile */
+        .filter-menu.mobile .btn-link {
+            color: #f9f9f9;
+        }
+
+        .filter-menu.mobile hr {
+            margin-top: 0;
+            border-top-color: #4B6473;
+        }
+
+        .filter-menu.mobile .panel-group .panel-heading+.panel-collapse>.panel-body {
+            border-color: #4B6473;
+        }
+
+        .filter-menu.mobile .panel {
+            border-color: #4B6473;
+            background: #30404a;
+            color: #f9f9f9;
+        }
+
+        .filter-menu.mobile .panel-heading {
+            background: #30404a;
+        }
+
+        .filter-menu.mobile a.panel-title {
+            color: #f9f9f9;
+        }
+
+        .filter-menu.mobile a.panel-title:hover {
+            color: #f9f9f9;
+        }
+
+        .filter-menu.mobile .panel-group .panel {
+            border-color: #4B6473;
+        }
+
+        .filter-menu.mobile .panel-group .panel-title {
+            background: #3f5460;
+        }
+
+        .filter-menu.mobile .panel-group .panel-title:hover {
+            color: #f9f9f9;
+            background: #30404a;
+        }
+    </style>
 </head>
 
 <body>
     <?php
     include 'navbar.php';
     ?>
-    <div class="container mt-5 mb-5">
+
+    <div class="containerr container mt-5 mb-5 ms-5 me-5">
+        <div class="row d-flex">
+            <div class="col-md-6">
+                <div class="filter-menu">
+                    <form method="GET">
+                        <!-- Filter by Job Title -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingJobTitle">
+                                <a class="panel-title accordion-toggle" role="button" data-toggle="collapse" href="#collapseJobTitle" aria-expanded="true" aria-controls="collapseJobTitle">
+                                    Filter by Job Title
+                                </a>
+                            </div>
+                            <div id="collapseJobTitle" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingJobTitle">
+                                <div class="panel-body">
+                                    <?php
+                                    foreach ($distinctJobTitle as $jobTitleOption) {
+                                        $checked = (in_array($jobTitleOption, $jobTitleFilter)) ? 'checked' : '';
+                                        echo "<div class='form-check'><input class='form-check-input' type='checkbox' name='jobTitle[]' value='$jobTitleOption' $checked><label class='form-check-label'>$jobTitleOption</label></div>";
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filter by Education Levels -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingEducationLevels">
+                                <a class="panel-title accordion-toggle" role="button" data-toggle="collapse" href="#collapseEducationLevels" aria-expanded="true" aria-controls="collapseEducationLevels">
+                                    Filter by Education Levels
+                                </a>
+                            </div>
+                            <div id="collapseEducationLevels" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingEducationLevels">
+                                <div class="panel-body">
+                                    <?php
+                                    foreach ($distinctEducationLevel as $educationLevelOption) {
+                                        $encodedOption = htmlspecialchars($educationLevelOption, ENT_QUOTES, 'UTF-8');
+                                        $checked = (in_array($encodedOption, $educationLevelFilter)) ? 'checked' : '';
+                                        echo "<div class='form-check'><input class='form-check-input' type='checkbox' name='educationLevel[]' value='$encodedOption' $checked><label class='form-check-label'>$educationLevelOption</label></div>";
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filter by Years of Experience -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingYears">
+                                <a class="panel-title accordion-toggle" role="button" data-toggle="collapse" href="#collapseYears" aria-expanded="true" aria-controls="collapseYears">
+                                    Filter by Years of Experience
+                                </a>
+                            </div>
+                            <div id="collapseYears" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingYears">
+                                <div class="panel-body">
+                                    <label style="font-size: small;">Years of Experience(Less Than Equal):</label>
+                                    <input type="number" id="years" name="years" class="form-control mb-3" placeholder="Enter Years of Experience" value="<?= $yearsFilter ?>">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mb-5">Apply Filters</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-5 mb-5" style="margin-right: 20px;">
         <div class="row d-flex justify-content-center">
             <h1 class="text-center">Applicant</h1>
-            <div class="col-md-8">
-                <form method="GET">
-                    <label>Filter by Job Title:</label>
-                    <select id="jobTitleFilter" name="jobTitle" class="form-select mb-3">
-                        <option value="">All Job Title</option>
-                        <?php
-                        foreach ($distinctJobTitle as $jobTitleOption) {
-                            $selected = ($jobTitleOption == $jobTitleFilter) ? 'selected' : '';
-                            echo "<option value='$jobTitleOption' $selected>$jobTitleOption</option>";
-                        }
-                        ?>
-                    </select>
-
-                    <label>Filter by Education Level:</label>
-                    <select id="educationLevelFilter" name="educationLevel" class="form-select mb-3">
-                        <option value="">All Education Levels</option>
-                        <?php
-                        foreach ($distinctEducationLevel as $educationLevelOption) {
-                            // Use htmlspecialchars to encode special characters
-                            $encodedOption = htmlspecialchars($educationLevelOption, ENT_QUOTES, 'UTF-8');
-
-                            $selected = ($educationLevelOption == $educationLevelFilter) ? 'selected' : '';
-                            echo "<option value='$encodedOption' $selected>$encodedOption</option>";
-                        }
-                        ?>
-                    </select>
-
-
-                    <label>Years of Experience(Less Than Equal):</label>
-                    <input type="number" id="years" name="years" class="form-control mb-3" placeholder="Enter Years of Experience" value="<?= $yearsFilter ?>">
-
-
-                    <button type="submit" class="btn btn-primary mb-5">Apply Filters</button>
-                </form>
-            </div>
 
 
             <div class="row d-flex justify-content-center">
