@@ -59,6 +59,7 @@
         box-shadow: 0px 0px 7px #000000;
         background: #fff;
         font-family: 'Lexend', sans-serif;
+        width: auto;
     }
 
     .sidebar-wrap {
