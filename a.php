@@ -21,17 +21,19 @@ $pipeline[] = [
         'Employee Name' => ['$first' => '$Employee Name'],
         'Performance Score' => ['$first' => '$Performance Score'],
         'Current Employee Rating' => ['$first' => ['$toInt' => '$Current Employee Rating']],
+        'Department' => ['$first' => '$Department'],
+        'Position' => ['$first' => '$Position'],
     ],
 ];
 
 // Match by Performance Score
 // if ($scoreFilter) {
-    $pipeline[] = ['$match' => ['Performance Score' => "Needs Improvement"]];
+$pipeline[] = ['$match' => ['Performance Score' => "Needs Improvement"]];
 // }
 
 // Match by Rating less than the given Rating
 // if ($ratingFilter) {
-    $pipeline[] = ['$match' => ['Current Employee Rating' => ['$lte' => 1]]];
+$pipeline[] = ['$match' => ['Current Employee Rating' => ['$lte' => 1]]];
 // }
 
 $cursor = $resto->aggregate($pipeline);
@@ -62,11 +64,12 @@ $employeeJson = json_encode($employee);
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
     <?php
-        include 'navhead.php';
+    include 'navhead.php';
     ?>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lexend&display=swap');
+
         .container {
             border: 1px solid black;
             border-radius: 15px;
@@ -80,19 +83,21 @@ $employeeJson = json_encode($employee);
 
 <body>
     <?php
-        include 'navbar.php';
+    include 'navbar.php';
     ?>
     <div class="container mt-5 mb-5">
         <div class="row d-flex justify-content-center">
             <h1 class="text-center">Worst Performance Score and Rating</h1>
         </div>
 
-        <div class="row d-flex justify-content-center">
+        <div class="row d-flex justify-content-center mt-3">
             <div class="col-md-10">
                 <table id="employeeTable" class="table table-bordered table-striped">
                     <thead class="">
                         <tr>
                             <th>Name</th>
+                            <th>Department</th>
+                            <th>Position</th>
                             <th>Performance Score</th>
                             <th>Current Employee Rating</th>
                         </tr>
@@ -114,19 +119,33 @@ $employeeJson = json_encode($employee);
             var table = $('#employeeTable').DataTable({
                 // scrollX: true,
                 scrollCollapse: true,
-                // searching: false,
+                searching: false,
+                paging: false,
+                info: false,
+                "columnDefs": [{
+                    "className": "dt-center",
+                    "targets": "_all"
+                }],
                 data: employeeData,
                 columns: [{
                         data: 'Employee Name',
-                        width: '28%'
+                        width: '20%'
+                    },
+                    {
+                        data: 'Department',
+                        width: '20%',
+                    },
+                    {
+                        data: 'Position',
+                        width: '20%',
                     },
                     {
                         data: 'Performance Score',
-                        width: '20%',
+                        width: '18%',
                     },
                     {
                         data: 'Current Employee Rating',
-                        width: '20%',
+                        width: '22%',
                     },
                 ]
             });

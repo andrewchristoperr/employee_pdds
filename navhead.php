@@ -37,19 +37,15 @@
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 <!-- bootstrap -->
 <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'>
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'>  
-
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'>
 
 <style>
-    body { 
+    body {
         display: flex;
         background: #f0f0f0;
         font-family: 'Lexend', sans-serif;
     }
+
     .container {
         border: 1px solid black;
         border-radius: 15px;
@@ -58,8 +54,8 @@
         box-shadow: 0px 0px 7px #000000;
         background: #fff;
         font-family: 'Lexend', sans-serif;
-        width: auto;
     }
+
     .sidebar-wrap {
         width: 60px;
         min-height: 100vh;
@@ -67,21 +63,27 @@
         color: #000;
         padding: 10px;
         transition: 0.8s;
+        transition: width 0.8s;
     }
+
     .sidebar-wrap:hover {
         width: 280px;
     }
+
     .sidebar-wrap:hover .nav li .nav-link span {
         display: flex;
     }
+
     .sidebar-wrap .nav {
         overflow-x: hidden;
         overflow-y: auto;
         flex-wrap: nowrap;
     }
+
     .sidebar-wrap .nav li {
         margin-top: 5px;
     }
+
     .sidebar-wrap .nav li .nav-link {
         color: #000;
         padding: 0;
@@ -90,6 +92,7 @@
         align-items: center;
         gap: 5px;
     }
+
     .sidebar-wrap .nav li .nav-link .icon-wrap {
         display: flex;
         align-items: center;
@@ -98,122 +101,22 @@
         min-width: 40px;
         font-family: default
     }
+
     .sidebar-wrap .nav li .nav-link span {
         font-size: 16px;
     }
+
     .sidebar-wrap .nav li .nav-link.active {
         background-color: #f0f0f0;
     }
+
     .sidebar-wrap .nav li .nav-link:hover {
         background-color: #f0f0f0;
     }
-    
+
     @import url('https://fonts.googleapis.com/css2?family=Lexend&display=swap');
 
     * {
         font-family: 'Lexend', sans-serif
     }
-
-    /* filter */
-
-    .primary {
-    min-height: 800px;
-    }
-    /*** Accordion Toggles ***/
-    .panel-heading {
-    position: relative;
-    }
-    .panel-heading .accordion-toggle:after {
-    font-family: 'Glyphicons Halflings';
-    content: "\e260";
-    position: absolute;
-    right: 16px;
-    }
-    .panel-heading .accordion-toggle.collapsed:after {
-    font-family: 'Glyphicons Halflings';
-    content: "\e259";
-    }
-    /*** Filter Menu ***/
-    /* Panels */
-    .filter-menu {
-    min-width: 220px;
-    }
-    .filter-menu .panel {
-    border-radius: 0;
-    border: 1px solid #eeeeee;
-    }
-    .filter-menu .panel-heading {
-    background: #fff;
-    padding: 0;
-    }
-    .filter-menu .panel-title {
-    color: #333333;
-    font-weight: bold;
-    display: block;
-    padding: 16px;
-    }
-    .filter-menu a.panel-title {
-    color: #333333;
-    }
-    .filter-menu a.panel-title:hover,
-    .filter-menu a.panel-title:focus {
-    color: #333333;
-    text-decoration: none;
-    }
-    .filter-menu .panel-body {
-    padding: 16px;
-    }
-    /* Inner Panels */
-    .filter-menu .panel-group {
-    margin: -16px;
-    }
-    .filter-menu .panel-group .panel-title {
-    background: #eee;
-    transition: color, 0.5s, ease;
-    }
-    .filter-menu .panel-group .panel-title:hover {
-    color: #333333;
-    text-decoration: none;
-    background: #777777;
-    }
-    .filter-menu .panel-group .panel + .panel {
-    margin-top: 0;
-    }
-    /*** Filter Menu - Mobile ***/
-    /* Panels - Mobile */
-    .filter-menu.mobile .btn-link {
-    color: #f9f9f9;
-    }
-    .filter-menu.mobile hr {
-    margin-top: 0;
-    border-top-color: #4B6473;
-    }
-    .filter-menu.mobile .panel-group .panel-heading + .panel-collapse > .panel-body {
-    border-color: #4B6473;
-    }
-    .filter-menu.mobile .panel {
-    border-color: #4B6473;
-    background: #30404a;
-    color: #f9f9f9;
-    }
-    .filter-menu.mobile .panel-heading {
-    background: #30404a;
-    }
-    .filter-menu.mobile a.panel-title {
-    color: #f9f9f9;
-    }
-    .filter-menu.mobile a.panel-title:hover {
-    color: #f9f9f9;
-    }
-    .filter-menu.mobile .panel-group .panel {
-    border-color: #4B6473;
-    }
-    .filter-menu.mobile .panel-group .panel-title {
-    background: #3f5460;
-    }
-    .filter-menu.mobile .panel-group .panel-title:hover {
-    color: #f9f9f9;
-    background: #30404a;
-    }
-
 </style>

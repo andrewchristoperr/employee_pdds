@@ -20,8 +20,8 @@ $deptNameFilter = is_array($deptNameFilter) ? $deptNameFilter : ($deptNameFilter
 $raceFilter = is_array($raceFilter) ? $raceFilter : ($raceFilter !== '' ? [$raceFilter] : []);
 
 // Modified code to store imploded values in variables
-$implodedDeptName = implode(',', $deptNameFilter);
-$implodedRace = implode(',', $raceFilter);
+$implodedDeptName = implode("','", $deptNameFilter);
+$implodedRace = implode("','", $raceFilter);
 
 ?>
 
@@ -72,6 +72,116 @@ $implodedRace = implode(',', $raceFilter);
             font-family: 'Lexend', sans-serif
         }
     </style>
+
+    <!-- slicer -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+        .container {
+            width: auto;
+        }
+        .primary {
+            min-height: 800px;
+        }
+        /*** Accordion Toggles ***/
+        .panel-heading {
+            position: relative;
+        }
+        .panel-heading .accordion-toggle:after {
+            font-family: 'Glyphicons Halflings';
+            content: "\e260";
+            position: absolute;
+            right: 16px;
+        }
+        .panel-heading .accordion-toggle.collapsed:after {
+            font-family: 'Glyphicons Halflings';
+            content: "\e259";
+        }
+        /*** Filter Menu ***/
+        /* Panels */
+        .filter-menu {
+            min-width: 220px;
+        }
+        .filter-menu .panel {
+            border-radius: 0;
+            border: 1px solid #eeeeee;
+        }
+        .filter-menu .panel-heading {
+            background: #fff;
+            padding: 0;
+        }
+        .filter-menu .panel-title {
+            color: #333333;
+            font-weight: bold;
+            display: block;
+            padding: 16px;
+        }
+        .filter-menu a.panel-title {
+            color: #333333;
+        }
+        .filter-menu a.panel-title:hover,
+        .filter-menu a.panel-title:focus {
+            color: #333333;
+            text-decoration: none;
+        }
+        .filter-menu .panel-body {
+            padding: 16px;
+        }
+        /* Inner Panels */
+        .filter-menu .panel-group {
+            margin: -16px;
+        }
+        .filter-menu .panel-group .panel-title {
+            background: #eee;
+            transition: color, 0.5s, ease;
+        }
+        .filter-menu .panel-group .panel-title:hover {
+            color: #333333;
+            text-decoration: none;
+            background: #777777;
+        }
+        .filter-menu .panel-group .panel + .panel {
+            margin-top: 0;
+        }
+        /*** Filter Menu - Mobile ***/
+        /* Panels - Mobile */
+        .filter-menu.mobile .btn-link {
+            color: #f9f9f9;
+        }
+        .filter-menu.mobile hr {
+            margin-top: 0;
+            border-top-color: #4B6473;
+        }
+        .filter-menu.mobile .panel-group .panel-heading + .panel-collapse > .panel-body {
+            border-color: #4B6473;
+        }
+        .filter-menu.mobile .panel {
+            border-color: #4B6473;
+            background: #30404a;
+            color: #f9f9f9;
+        }
+        .filter-menu.mobile .panel-heading {
+            background: #30404a;
+        }
+        .filter-menu.mobile a.panel-title {
+            color: #f9f9f9;
+        }
+        .filter-menu.mobile a.panel-title:hover {
+            color: #f9f9f9;
+        }
+        .filter-menu.mobile .panel-group .panel {
+            border-color: #4B6473;
+        }
+        .filter-menu.mobile .panel-group .panel-title {
+            background: #3f5460;
+        }
+        .filter-menu.mobile .panel-group .panel-title:hover {
+            color: #f9f9f9;
+            background: #30404a;
+        }
+    </style>
+
 
 </head>
 
@@ -130,12 +240,14 @@ $implodedRace = implode(',', $raceFilter);
         </div>
     </div>
 
-    <!-- enable collapse -->
+    <!-- collapse -->
     <script>
         jQuery(document).ready(function ($) {
-            $('.collapse').collapse();
+            // Menonaktifkan collapse pertama kali halaman dimuat
+            $('.collapse').removeClass('show');
         });
     </script>
+
 
 
     <div class="container mt-5 mb-5 me-5">
@@ -159,8 +271,8 @@ $implodedRace = implode(',', $raceFilter);
                                     $survey = "SELECT employee.dept_name, employee.race, AVG(survey.satisfaction_score) AS avg_satisfaction_score
                                                 FROM employee
                                                 JOIN survey ON employee.emp_id = survey.emp_id
-                                                WHERE (:deptNameFilter = '' OR employee.dept_name IN (:deptNameFilter))
-                                                AND (:raceFilter = '' OR employee.race IN (:raceFilter))
+                                                WHERE (:deptNameFilter = '' OR employee.dept_name IN ('$implodedDeptName'))
+                                                AND (:raceFilter = '' OR employee.race IN ('$implodedRace'))
                                                 GROUP BY employee.dept_name, employee.race";
                                     $stmt = $conn->prepare($survey);
                                     $stmt->bindParam(':deptNameFilter', $implodedDeptName, PDO::PARAM_STR);
