@@ -11,9 +11,18 @@ $distinctRaceQuery = "SELECT DISTINCT race FROM employee ORDER BY race";
 $distinctRaceResult = $conn->query($distinctRaceQuery);
 $distinctRace = $distinctRaceResult->fetchAll(PDO::FETCH_COLUMN);
 
-// Set the filter values based on the submitted form values
+// Existing code to initialize filters
 $deptNameFilter = isset($_GET['dept_name']) ? $_GET['dept_name'] : '';
 $raceFilter = isset($_GET['race']) ? $_GET['race'] : '';
+
+// Check if the filters are arrays; if not, convert them to arrays
+$deptNameFilter = is_array($deptNameFilter) ? $deptNameFilter : ($deptNameFilter !== '' ? [$deptNameFilter] : []);
+$raceFilter = is_array($raceFilter) ? $raceFilter : ($raceFilter !== '' ? [$raceFilter] : []);
+
+// Modified code to store imploded values in variables
+$implodedDeptName = implode(',', $deptNameFilter);
+$implodedRace = implode(',', $raceFilter);
+
 ?>
 
 <!DOCTYPE html>
@@ -71,36 +80,67 @@ $raceFilter = isset($_GET['race']) ? $_GET['race'] : '';
         include 'navbar.php';
     ?>
 
-    <div class="container mt-5 mb-5">
+    <div class="container mt-5 mb-5 ms-5 me-5">
+        <div class="row d-flex">
+            <div class="col-md-6">
+                <div class="filter-menu">
+                    <form method="GET">
+                        <!-- Filter by Department -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingDepartment">
+                                <a class="panel-title accordion-toggle" role="button" data-toggle="collapse" href="#collapseDepartment" aria-expanded="true" aria-controls="collapseDepartment">
+                                    Filter by Department
+                                </a>
+                            </div>
+                            <div id="collapseDepartment" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingDepartment">
+                                <div class="panel-body">
+                                    <?php
+                                    foreach ($distinctDeptName as $deptNameOption) {
+                                        $isChecked = is_array($deptNameFilter) && in_array($deptNameOption, $deptNameFilter) ? 'checked' : '';
+                                        echo "<div class='checkbox'><label><input type='checkbox' name='dept_name[]' value='$deptNameOption' $isChecked>$deptNameOption</label></div>";
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filter by Race -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingRace">
+                                <a class="panel-title accordion-toggle" role="button" data-toggle="collapse" href="#collapseRace" aria-expanded="true" aria-controls="collapseRace">
+                                    Filter by Race
+                                </a>
+                            </div>
+                            <div id="collapseRace" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingRace">
+                                <div class="panel-body">
+                                    <?php
+                                    foreach ($distinctRace as $raceOption) {
+                                        $isChecked = is_array($raceFilter) && in_array($raceOption, $raceFilter) ? 'checked' : '';
+                                        echo "<div class='checkbox'><label><input type='checkbox' name='race[]' value='$raceOption' $isChecked>$raceOption</label></div>";
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mb-5">Apply Filters</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- enable collapse -->
+    <script>
+        jQuery(document).ready(function ($) {
+            $('.collapse').collapse();
+        });
+    </script>
+
+
+    <div class="container mt-5 mb-5 me-5">
         <div style="text-align: center" class="row d-flex justify-content-center">
             <h1>Satisfaction Score by Department and Race</h1>
-            <div class="col-md-8">
-                <form method="GET">
-                    <label>Filter by Department:</label>
-                    <select id="deptNameFilter" name="dept_name" class="form-select mb-3">
-                        <option value="">All Departments</option>
-                        <?php
-                        foreach ($distinctDeptName as $deptNameOption) {
-                            $selected = ($deptNameOption == $deptNameFilter) ? 'selected' : '';
-                            echo "<option value='$deptNameOption' $selected>$deptNameOption</option>";
-                        }
-                        ?>
-                    </select>
-
-                    <label>Filter by Race:</label>
-                    <select id="raceFilter" name="race" class="form-select mb-3">
-                        <option value="">All Races</option>
-                        <?php
-                        foreach ($distinctRace as $raceOption) {
-                            $selected = ($raceOption == $raceFilter) ? 'selected' : '';
-                            echo "<option value='$raceOption' $selected>$raceOption</option>";
-                        }
-                        ?>
-                    </select>
-
-                    <button type="submit" class="btn btn-primary mb-5">Apply Filters</button>
-                </form>
-            </div>
 
             <div class="row">
                 <div>
@@ -119,12 +159,12 @@ $raceFilter = isset($_GET['race']) ? $_GET['race'] : '';
                                     $survey = "SELECT employee.dept_name, employee.race, AVG(survey.satisfaction_score) AS avg_satisfaction_score
                                                 FROM employee
                                                 JOIN survey ON employee.emp_id = survey.emp_id
-                                                WHERE (:deptNameFilter = '' OR employee.dept_name = :deptNameFilter)
-                                                AND (:raceFilter = '' OR employee.race = :raceFilter)
+                                                WHERE (:deptNameFilter = '' OR employee.dept_name IN (:deptNameFilter))
+                                                AND (:raceFilter = '' OR employee.race IN (:raceFilter))
                                                 GROUP BY employee.dept_name, employee.race";
                                     $stmt = $conn->prepare($survey);
-                                    $stmt->bindParam(':deptNameFilter', $deptNameFilter);
-                                    $stmt->bindParam(':raceFilter', $raceFilter);
+                                    $stmt->bindParam(':deptNameFilter', $implodedDeptName, PDO::PARAM_STR);
+                                    $stmt->bindParam(':raceFilter', $implodedRace, PDO::PARAM_STR);
                                     $stmt->execute();
                                     $result = $stmt->fetchAll();
                                     foreach ($result as $data) :
