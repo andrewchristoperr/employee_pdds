@@ -11,9 +11,18 @@ $distinctRaceQuery = "SELECT DISTINCT race FROM employee ORDER BY race";
 $distinctRaceResult = $conn->query($distinctRaceQuery);
 $distinctRace = $distinctRaceResult->fetchAll(PDO::FETCH_COLUMN);
 
-// Set the filter values based on the submitted form values
+// Existing code to initialize filters
 $deptNameFilter = isset($_GET['dept_name']) ? $_GET['dept_name'] : '';
 $raceFilter = isset($_GET['race']) ? $_GET['race'] : '';
+
+// Check if the filters are arrays; if not, convert them to arrays
+$deptNameFilter = is_array($deptNameFilter) ? $deptNameFilter : ($deptNameFilter !== '' ? [$deptNameFilter] : []);
+$raceFilter = is_array($raceFilter) ? $raceFilter : ($raceFilter !== '' ? [$raceFilter] : []);
+
+// Modified code to store imploded values in variables
+$implodedDeptName = implode("','", $deptNameFilter);
+$implodedRace = implode("','", $raceFilter);
+
 ?>
 
 <!DOCTYPE html>
@@ -51,17 +60,9 @@ $raceFilter = isset($_GET['race']) ? $_GET['race'] : '';
     <!-- Sweet Alert -->
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" id="theme-styles">
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
     <?php
-    include 'navhead.php';
+        include 'navhead.php';
     ?>
 
     <style>
@@ -72,94 +73,232 @@ $raceFilter = isset($_GET['race']) ? $_GET['race'] : '';
         }
     </style>
 
+    <!-- slicer -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+        .container {
+            width: auto;
+        }
+        .primary {
+            min-height: 800px;
+        }
+        /*** Accordion Toggles ***/
+        .panel-heading {
+            position: relative;
+        }
+        .panel-heading .accordion-toggle:after {
+            font-family: 'Glyphicons Halflings';
+            content: "\e260";
+            position: absolute;
+            right: 16px;
+        }
+        .panel-heading .accordion-toggle.collapsed:after {
+            font-family: 'Glyphicons Halflings';
+            content: "\e259";
+        }
+        /*** Filter Menu ***/
+        /* Panels */
+        .filter-menu {
+            min-width: 220px;
+        }
+        .filter-menu .panel {
+            border-radius: 0;
+            border: 1px solid #eeeeee;
+        }
+        .filter-menu .panel-heading {
+            background: #fff;
+            padding: 0;
+        }
+        .filter-menu .panel-title {
+            color: #333333;
+            font-weight: bold;
+            display: block;
+            padding: 16px;
+        }
+        .filter-menu a.panel-title {
+            color: #333333;
+        }
+        .filter-menu a.panel-title:hover,
+        .filter-menu a.panel-title:focus {
+            color: #333333;
+            text-decoration: none;
+        }
+        .filter-menu .panel-body {
+            padding: 16px;
+        }
+        /* Inner Panels */
+        .filter-menu .panel-group {
+            margin: -16px;
+        }
+        .filter-menu .panel-group .panel-title {
+            background: #eee;
+            transition: color, 0.5s, ease;
+        }
+        .filter-menu .panel-group .panel-title:hover {
+            color: #333333;
+            text-decoration: none;
+            background: #777777;
+        }
+        .filter-menu .panel-group .panel + .panel {
+            margin-top: 0;
+        }
+        /*** Filter Menu - Mobile ***/
+        /* Panels - Mobile */
+        .filter-menu.mobile .btn-link {
+            color: #f9f9f9;
+        }
+        .filter-menu.mobile hr {
+            margin-top: 0;
+            border-top-color: #4B6473;
+        }
+        .filter-menu.mobile .panel-group .panel-heading + .panel-collapse > .panel-body {
+            border-color: #4B6473;
+        }
+        .filter-menu.mobile .panel {
+            border-color: #4B6473;
+            background: #30404a;
+            color: #f9f9f9;
+        }
+        .filter-menu.mobile .panel-heading {
+            background: #30404a;
+        }
+        .filter-menu.mobile a.panel-title {
+            color: #f9f9f9;
+        }
+        .filter-menu.mobile a.panel-title:hover {
+            color: #f9f9f9;
+        }
+        .filter-menu.mobile .panel-group .panel {
+            border-color: #4B6473;
+        }
+        .filter-menu.mobile .panel-group .panel-title {
+            background: #3f5460;
+        }
+        .filter-menu.mobile .panel-group .panel-title:hover {
+            color: #f9f9f9;
+            background: #30404a;
+        }
+    </style>
+
+
 </head>
 
 <body>
     <?php
-    include 'navbar.php';
+        include 'navbar.php';
     ?>
 
-    <div class="container mt-5 mb-5">
-        <div class="row d-flex justify-content-center">
-            <h1 class="text-center">Satisfaction Score by Department and Race</h1>
-            <div class="col-md-8">
-                <form method="GET">
-                    <label>Filter by Department:</label>
-                    <select id="deptNameFilter" name="dept_name" class="form-select mb-3">
-                        <option value="">All Departments</option>
-                        <?php
-                        foreach ($distinctDeptName as $deptNameOption) {
-                            $selected = ($deptNameOption == $deptNameFilter) ? 'selected' : '';
-                            echo "<option value='$deptNameOption' $selected>$deptNameOption</option>";
-                        }
-                        ?>
-                    </select>
+    <div class="container mt-5 mb-5 ms-5 me-5">
+        <div class="row d-flex">
+            <div class="col-md-6">
+                <div class="filter-menu">
+                    <form method="GET">
+                        <!-- Filter by Department -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingDepartment">
+                                <a class="panel-title accordion-toggle" role="button" data-toggle="collapse" href="#collapseDepartment" aria-expanded="true" aria-controls="collapseDepartment">
+                                    Filter by Department
+                                </a>
+                            </div>
+                            <div id="collapseDepartment" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingDepartment">
+                                <div class="panel-body">
+                                    <?php
+                                    foreach ($distinctDeptName as $deptNameOption) {
+                                        $isChecked = is_array($deptNameFilter) && in_array($deptNameOption, $deptNameFilter) ? 'checked' : '';
+                                        echo "<div class='checkbox'><label><input type='checkbox' name='dept_name[]' value='$deptNameOption' $isChecked>$deptNameOption</label></div>";
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
 
-                    <label>Filter by Race:</label>
-                    <select id="raceFilter" name="race" class="form-select mb-3">
-                        <option value="">All Races</option>
-                        <?php
-                        foreach ($distinctRace as $raceOption) {
-                            $selected = ($raceOption == $raceFilter) ? 'selected' : '';
-                            echo "<option value='$raceOption' $selected>$raceOption</option>";
-                        }
-                        ?>
-                    </select>
+                        <!-- Filter by Race -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingRace">
+                                <a class="panel-title accordion-toggle" role="button" data-toggle="collapse" href="#collapseRace" aria-expanded="true" aria-controls="collapseRace">
+                                    Filter by Race
+                                </a>
+                            </div>
+                            <div id="collapseRace" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingRace">
+                                <div class="panel-body">
+                                    <?php
+                                    foreach ($distinctRace as $raceOption) {
+                                        $isChecked = is_array($raceFilter) && in_array($raceOption, $raceFilter) ? 'checked' : '';
+                                        echo "<div class='checkbox'><label><input type='checkbox' name='race[]' value='$raceOption' $isChecked>$raceOption</label></div>";
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
 
-                    <button type="submit" class="btn btn-primary mb-5">Apply Filters</button>
-                </form>
+                        <button type="submit" class="btn btn-primary mb-5">Apply Filters</button>
+                    </form>
+                </div>
             </div>
         </div>
+    </div>
 
-        <div class="row">
-            <div>
-                <div class="row d-flex justify-content-center">
-                    <div class="col-md-10">
-                        <table id="tablePendapatan" class="table table-bordered table-striped" style="width:100%">
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="center-contents">Department</th>
-                                    <th scope="col" class="center-contents">Race</th>
-                                    <th scope="col" class="center-contents">Average Satisfaction Score</th>
-                                </tr>
-                            </thead>
-                            <tbody class="center-contents">
-                                <?php
-                                $survey = "SELECT employee.dept_name, employee.race, AVG(survey.satisfaction_score) AS avg_satisfaction_score
+    <!-- collapse -->
+    <script>
+        jQuery(document).ready(function ($) {
+            // Menonaktifkan collapse pertama kali halaman dimuat
+            $('.collapse').removeClass('show');
+        });
+    </script>
+
+
+
+    <div class="container mt-5 mb-5 me-5">
+        <div style="text-align: center" class="row d-flex justify-content-center">
+            <h1>Satisfaction Score by Department and Race</h1>
+
+            <div class="row">
+                <div>
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-md-10">
+                            <table id="tablePendapatan" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="center-contents">Department</th>
+                                        <th scope="col" class="center-contents">Race</th>
+                                        <th scope="col" class="center-contents">Average Satisfaction Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="center-contents">
+                                    <?php
+                                    $survey = "SELECT employee.dept_name, employee.race, AVG(survey.satisfaction_score) AS avg_satisfaction_score
                                                 FROM employee
                                                 JOIN survey ON employee.emp_id = survey.emp_id
-                                                WHERE (:deptNameFilter = '' OR employee.dept_name = :deptNameFilter)
-                                                AND (:raceFilter = '' OR employee.race = :raceFilter)
+                                                WHERE (:deptNameFilter = '' OR employee.dept_name IN ('$implodedDeptName'))
+                                                AND (:raceFilter = '' OR employee.race IN ('$implodedRace'))
                                                 GROUP BY employee.dept_name, employee.race";
-                                $stmt = $conn->prepare($survey);
-                                $stmt->bindParam(':deptNameFilter', $deptNameFilter);
-                                $stmt->bindParam(':raceFilter', $raceFilter);
-                                $stmt->execute();
-                                $result = $stmt->fetchAll();
-                                foreach ($result as $data) :
-                                ?>
-                                    <tr>
-                                        <td><?= $data['dept_name'] ?></td>
-                                        <td><?= $data['race'] ?></td>
-                                        <td><?= number_format($data['avg_satisfaction_score'], 2) ?></td>
-                                    </tr>
-                                <?php endforeach ?>
-                            </tbody>
-                        </table>
+                                    $stmt = $conn->prepare($survey);
+                                    $stmt->bindParam(':deptNameFilter', $implodedDeptName, PDO::PARAM_STR);
+                                    $stmt->bindParam(':raceFilter', $implodedRace, PDO::PARAM_STR);
+                                    $stmt->execute();
+                                    $result = $stmt->fetchAll();
+                                    foreach ($result as $data) :
+                                    ?>
+                                        <tr>
+                                            <td><?= $data['dept_name'] ?></td>
+                                            <td><?= $data['race'] ?></td>
+                                            <td><?= number_format($data['avg_satisfaction_score'], 2) ?></td>
+                                        </tr>
+                                    <?php endforeach ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <script>
-            $(document).ready(function() {
-                $('#tablePendapatan').DataTable({
-                    "columnDefs": [{
-                        "className": "dt-center",
-                        "targets": "_all"
-                    }],
-                });
-            });
-        </script>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#tablePendapatan').DataTable();
+        });
+    </script>
 </body>
-
 </html>
