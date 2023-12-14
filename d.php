@@ -191,7 +191,7 @@ $applicantJson = json_encode($applicant);
             $(document).ready(function() {
                 // Initialize DataTable
                 var table = $('#applicantTable').DataTable({
-                    // scrollX: true,
+                    scrollX: true,
                     scrollCollapse: true,
                     searching: false,
                     // paging: false,
