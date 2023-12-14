@@ -78,6 +78,9 @@ $implodedRace = implode("','", $raceFilter);
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <style>
+        body {
+            background-color: #f0f0f0;
+        }
         .container {
             width: auto;
         }
