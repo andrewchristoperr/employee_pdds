@@ -39,9 +39,6 @@
 <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'>
 <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'>
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
 <style>
     body {
         display: flex;
@@ -57,7 +54,6 @@
         box-shadow: 0px 0px 7px #000000;
         background: #fff;
         font-family: 'Lexend', sans-serif;
-        width: auto;
     }
 
     .sidebar-wrap {
