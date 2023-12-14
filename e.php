@@ -67,6 +67,11 @@ require 'connect.php';
             </div>
             <div class="row">
                 <div>
+                    <div class="row d-flex justify-content-center mt-5">
+                        <div class="col-md-10">
+                            <canvas id="lineChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
                     <div class="row d-flex justify-content-center">
                         <div class="col-md-10">
                             <table id="tablePendapatan" class="table table-bordered table-striped" style="width:100%">
@@ -99,11 +104,7 @@ require 'connect.php';
                 </div>
             </div>
 
-            <div class="row d-flex justify-content-center mt-5">
-                <div class="col-md-10">
-                    <canvas id="lineChart" width="400" height="200"></canvas>
-                </div>
-            </div>
+
         </div>
     </div>
     <script>

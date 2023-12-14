@@ -44,6 +44,31 @@ $employee = iterator_to_array($cursor);
 // Convert PHP array to JSON
 $employeeJson = json_encode($employee);
 
+$topPipeline = [];
+$topPipeline[] = [
+    '$group' => [
+        '_id' => '$Employee ID',
+        'Employee Name' => ['$first' => '$Employee Name'],
+        'Performance Score' => ['$first' => '$Performance Score'],
+        'Current Employee Rating' => ['$first' => ['$toInt' => '$Current Employee Rating']],
+        'Department' => ['$first' => '$Department'],
+        'Position' => ['$first' => '$Position'],
+    ],
+];
+
+$topPipeline[] = ['$match' => ['Performance Score' => "Fully Meets"]];
+
+$topPipeline[] = ['$match' => ['Current Employee Rating' => 5]];
+
+$topPipeline[] = ['$limit' => 5];
+// Execute the updated aggregation pipeline
+$topCursor = $resto->aggregate($topPipeline);
+
+// Convert MongoDB cursor to a PHP array
+$topEmployees = iterator_to_array($topCursor);
+
+// Convert PHP array to JSON
+$topEmployeeJson = json_encode($topEmployees);
 ?>
 
 <!DOCTYPE html>
@@ -62,6 +87,10 @@ $employeeJson = json_encode($employee);
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <!-- DataTables Responsive CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/responsive.dataTables.min.css">
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    
 
     <?php
     include 'navhead.php';
@@ -70,13 +99,13 @@ $employeeJson = json_encode($employee);
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lexend&display=swap');
 
-        .container {
+        /* .container {
             border: 1px solid black;
             border-radius: 15px;
             padding-top: 25px;
             padding-bottom: 25px;
             box-shadow: 0px 0px 7px #000000;
-        }
+        } */
     </style>
 
 </head>
@@ -85,14 +114,14 @@ $employeeJson = json_encode($employee);
     <?php
     include 'navbar.php';
     ?>
-    <div class="container mt-5 mb-5">
-        <div class="row d-flex justify-content-center">
-            <h1 class="text-center">Worst Performance Score and Rating</h1>
+    <div class="container fluid mt-5 mb-5">
+        <div class="row mt-3">
+            <h1 class="text-center">Top Performance Score and Rating</h1>
         </div>
 
         <div class="row d-flex justify-content-center mt-3">
-            <div class="col-md-10">
-                <table id="employeeTable" class="table table-bordered table-striped">
+            <div class="col-md-10 mx-auto">
+                <table id="topEmployeeTable" class="table table-bordered table-striped" style="width: 100%;">
                     <thead class="">
                         <tr>
                             <th>Name</th>
@@ -108,6 +137,30 @@ $employeeJson = json_encode($employee);
             </div>
         </div>
 
+        <div class="row mt-5 d-flex justify-content-center">
+            <h1 class="text-center">Worst Performance Score and Rating</h1>
+        </div>
+
+        <div class="row d-flex justify-content-center mt-3">
+            <div class="col-md-10">
+                <table id="employeeTable" class="table table-bordered table-striped" style="width: 100%;">
+                    <thead class="">
+                        <tr>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Position</th>
+                            <th>Performance Score</th>
+                            <th>Current Employee Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+
     </div>
 
     <script>
@@ -117,11 +170,12 @@ $employeeJson = json_encode($employee);
         $(document).ready(function() {
             // Initialize DataTable
             var table = $('#employeeTable').DataTable({
-                // scrollX: true,
+                scrollX: true,
                 scrollCollapse: true,
                 searching: false,
                 paging: false,
                 info: false,
+                responsive: true,
                 "columnDefs": [{
                     "className": "dt-center",
                     "targets": "_all"
@@ -129,23 +183,63 @@ $employeeJson = json_encode($employee);
                 data: employeeData,
                 columns: [{
                         data: 'Employee Name',
-                        width: '20%'
+                        // width: '20%'
                     },
                     {
                         data: 'Department',
-                        width: '20%',
+                        // width: '20%',
                     },
                     {
                         data: 'Position',
-                        width: '20%',
+                        // width: '20%',
                     },
                     {
                         data: 'Performance Score',
-                        width: '18%',
+                        // width: '18%',
                     },
                     {
                         data: 'Current Employee Rating',
-                        width: '22%',
+                        // width: '22%',
+                    },
+                ]
+            });
+        });
+
+        var topEmployeeData = <?php echo $topEmployeeJson; ?>;
+
+        $(document).ready(function() {
+            // Initialize DataTable for Top Performance with Rating = 4
+            var topTable = $('#topEmployeeTable').DataTable({
+                scrollX: true,
+                scrollCollapse: true,
+                searching: false,
+                paging: false,
+                info: false,
+                responsive: true,
+                "columnDefs": [{
+                    "className": "dt-center",
+                    "targets": "_all"
+                }],
+                data: topEmployeeData,
+                columns: [{
+                        data: 'Employee Name',
+                        // width: '20%'
+                    },
+                    {
+                        data: 'Department',
+                        // width: '20%',
+                    },
+                    {
+                        data: 'Position',
+                        // width: '20%',
+                    },
+                    {
+                        data: 'Performance Score',
+                        // width: '18%',
+                    },
+                    {
+                        data: 'Current Employee Rating',
+                        // width: '22%',
                     },
                 ]
             });
