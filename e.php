@@ -37,9 +37,11 @@ require 'connect.php';
     <!-- Sweet Alert -->
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" id="theme-styles">
-    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <?php
-        include 'navhead.php';
+    include 'navhead.php';
     ?>
 
     <style>
@@ -54,47 +56,52 @@ require 'connect.php';
 
 <body>
     <?php
-        include 'navbar.php';
+    include 'navbar.php';
     ?>
 
     <div class="container mt-5 mb-5">
         <div class="row">
-            <div>
-                <div class="section-title" data-aos="fade-in" data-aos-delay="100">
-                    <h1 class="text-center">Comparation Salary Given dan Salary Desired</h1>
-                </div>
-                <div class="row">
-                    <div>
-                        <div class="row d-flex justify-content-center">
-                            <div class="col-md-10">
-                                <table id="tablePendapatan" class="table table-bordered table-striped" style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col" class="center-contents">Position</th>
-                                            <th scope="col" class="center-contents">Average Salary</th>
-                                            <th scope="col" class="center-contents">Average Salary Desired</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="center-contents">
-                                        <?php
-                                        $avgsalary =  "SELECT employee.position, AVG(employee.salary) AS avg_salary, AVG(recruitment.salary_desired) AS avg_salary_desired
+
+            <div class="section-title" data-aos="fade-in" data-aos-delay="100">
+                <h1 class="text-center">Comparation Salary Given dan Salary Desired</h1>
+            </div>
+            <div class="row">
+                <div>
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-md-10">
+                            <table id="tablePendapatan" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="center-contents">Position</th>
+                                        <th scope="col" class="center-contents">Average Salary</th>
+                                        <th scope="col" class="center-contents">Average Salary Desired</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="center-contents">
+                                    <?php
+                                    $avgsalary =  "SELECT employee.position, AVG(employee.salary) AS avg_salary, AVG(recruitment.salary_desired) AS avg_salary_desired
                                                         FROM employee
                                                         JOIN recruitment ON employee.position = recruitment.position
                                                         GROUP BY employee.position";
-                                        $result = $conn->query($avgsalary)->fetchAll();
-                                        foreach ($result as $data) :
-                                        ?>
-                                            <tr>
-                                                <td><?= $data['position'] ?></td>
-                                                <td><?= number_format($data['avg_salary'], 2) ?></td>
-                                                <td><?= number_format($data['avg_salary_desired'], 2) ?></td>
-                                            </tr>
-                                        <?php endforeach ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                                    $result = $conn->query($avgsalary)->fetchAll();
+                                    foreach ($result as $data) :
+                                    ?>
+                                        <tr>
+                                            <td><?= $data['position'] ?></td>
+                                            <td><?= number_format($data['avg_salary'], 2) ?></td>
+                                            <td><?= number_format($data['avg_salary_desired'], 2) ?></td>
+                                        </tr>
+                                    <?php endforeach ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="row d-flex justify-content-center mt-5">
+                <div class="col-md-10">
+                    <canvas id="lineChart" width="400" height="200"></canvas>
                 </div>
             </div>
         </div>
@@ -109,5 +116,60 @@ require 'connect.php';
             });
         });
     </script>
+    <script>
+        // Use the fetched JSON data
+        var salaryData = <?php echo json_encode($result); ?>;
+
+        $(document).ready(function() {
+            // Prepare data for the line chart
+            var chartData = {
+                labels: salaryData.map(function(item) {
+                    return item['position'];
+                }),
+                datasets: [{
+                    label: 'Average Salary',
+                    data: salaryData.map(function(item) {
+                        return item['avg_salary'];
+                    }),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: false,
+                }, {
+                    label: 'Average Desired Salary',
+                    data: salaryData.map(function(item) {
+                        return item['avg_salary_desired'];
+                    }),
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: false,
+                }]
+            };
+
+            // Get the canvas element
+            var ctx = document.getElementById('lineChart').getContext('2d');
+
+            // Create the line chart
+            var lineChart = new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    scales: {
+                        x: {
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
 </body>
+
 </html>
